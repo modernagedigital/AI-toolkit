@@ -1,14 +1,16 @@
+<!-- What: Prompt template for multi-agent code review  When: Attach to a workspace or pass to an agent to trigger a structured code review -->
+
 ## Code Review Instructions
 
 1. Launch a haiku agent to return a list of file paths (not their contents) for all relevant CLAUDE.md files including:
    - The root CLAUDE.md file, if it exists
-   - Any CLAUDE.md files in directories containing files modified by the workspace diff (use mcp**conductor**GetWorkspaceDiff with stat option)
+   - Any CLAUDE.md files in directories containing files modified by the workspace diff (use mcp__conductor__GetWorkspaceDiff with stat option)
 
 2. If this workspace has an associated PR, read the title and description (but not the changes). This will be helpful context.
 
-3. In parallel with step 2, launch a sonnet agent to view the changes, using mcp**conductor**GetWorkspaceDiff, and return a summary of the changes
+3. In parallel with step 2, launch a sonnet agent to view the changes, using mcp__conductor__GetWorkspaceDiff, and return a summary of the changes
 
-4. Launch 4 agents in parallel to independently review the changes using mcp**conductor**GetWorkspaceDiff. Each agent should return the list of issues, where each issue includes a description and the reason it was flagged (e.g. "CLAUDE.md adherence", "bug"). The agents should do the following:
+4. Launch 4 agents in parallel to independently review the changes using mcp__conductor__GetWorkspaceDiff. Each agent should return the list of issues, where each issue includes a description and the reason it was flagged (e.g. "CLAUDE.md adherence", "bug"). The agents should do the following:
 
    Agents 1 + 2: CLAUDE.md or AGENTS.md compliance sonnet agents
    Audit changes for CLAUDE.md or AGENTS.md compliance in parallel. Note: When evaluating CLAUDE.md or AGENTS.md compliance for a file, you should only consider CLAUDE.md or AGENTS.md files that share a file path with the file or parents.
@@ -37,7 +39,7 @@
 
 6. Filter out any issues that were not validated in step 5. This step will give us our list of high signal issues for our review.
 
-7. Post inline comments for each issue using mcp**conductor**DiffComment:
+7. Post inline comments for each issue using mcp__conductor__DiffComment:
 
    **IMPORTANT: Only post ONE comment per unique issue.**
 
@@ -79,11 +81,13 @@ If you don't have subagents, perform all the steps above yourself sequentially i
 
 ## Fallback: if you don't have access to the workspace diff tool
 
-If you don't have access to the mcp**conductor**GetWorkspaceDiff tool, use the following git commands to get the diff:
+If you don't have access to the mcp__conductor__GetWorkspaceDiff tool, use the following git commands to get the diff:
 
 ```bash
 # Get the merge base between this branch and the target
-MERGE_BASE=$(git merge-base origin/develop HEAD)
+DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
+if [ -z "$DEFAULT_BRANCH" ]; then DEFAULT_BRANCH="main"; fi
+MERGE_BASE=$(git merge-base origin/$DEFAULT_BRANCH HEAD)
 
 # Get the committed diff against the merge base
 git diff $MERGE_BASE HEAD
