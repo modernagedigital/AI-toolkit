@@ -9,7 +9,7 @@ A personal library of reusable AI assets — prompt templates, Claude Code skill
 ## Structure
 
 - `/prompts/` — Standalone one-shot instructions (plain `.md`, no frontmatter)
-- `/skills/` — Multi-step behavioural instructions with process definitions, output formats, and rules (plain `.md`)
+- `/skills/` — Multi-step behavioural instructions with process definitions, output formats, and rules (`.md` with YAML frontmatter: `name`, `description`)
 - `/agents/` — Claude Code subagent definitions (`.md` with YAML frontmatter: `name`, `description`, `tools`, `model`)
 - `/assets/` — Images and other static files
 
@@ -18,10 +18,19 @@ A personal library of reusable AI assets — prompt templates, Claude Code skill
 - One asset per file, `kebab-case.md` naming
 - Each file starts with a brief description of what it does and when to use it
 - Prompts: use an HTML comment block (`<!-- What: ... When: ... -->`) at the top
-- Skills: use markdown sections (`## Purpose`, `## Process`, `## Output Format`, `## Rules`)
+- Skills: YAML frontmatter (`name`, `description`) followed by markdown sections (`## Purpose`, `## Process`, `## Output Format`, `## Rules`)
 - Agents: YAML frontmatter (`name`, `description`, `tools`, `model`) followed by a system prompt body
 - If a prompt grows complex with rules and edge cases, it should become a skill
 - If a skill needs tool access and autonomous decision-making, it should become an agent
+
+## Skill Frontmatter Spec
+
+```yaml
+---
+name: kebab-case-identifier
+description: When Claude Code should invoke this skill
+---
+```
 
 ## Agent Frontmatter Spec
 
